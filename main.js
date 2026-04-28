@@ -2,7 +2,7 @@
 
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { run, setLogger } = require('./index');
+const { runFromExcel, setLogger } = require('./index');
 
 let mainWindow = null;
 
@@ -42,7 +42,8 @@ app.on('window-all-closed', () => {
 // -------------------------------------------------------
 // IPC — START AUTOMATION
 // -------------------------------------------------------
-ipcMain.on('start-automation', async (event, claimInput) => {
+ipcMain.on('start-automation', async (event, payload) => {
+  const excelPath = payload && payload.excelPath;
 
   // Wire logger → sends every log line to renderer
   setLogger((message) => {
@@ -65,7 +66,7 @@ ipcMain.on('start-automation', async (event, claimInput) => {
   }
 
   try {
-    await run(claimInput);
+    await runFromExcel(excelPath);
 
     // Notify UI: success
     if (mainWindow && !mainWindow.isDestroyed()) {

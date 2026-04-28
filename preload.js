@@ -1,12 +1,23 @@
 'use strict';
 
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
 
-  // Renderer → Main: start automation with claim input string
-  startAutomation: (claimInput) => {
-    ipcRenderer.send('start-automation', claimInput);
+  // Renderer → Main: start automation with excel payload
+  startAutomation: (payload) => {
+    ipcRenderer.send('start-automation', payload);
+  },
+
+  // Renderer helper: get absolute path for <input type="file"> File
+  // (File.path was removed in newer Electron versions)
+  getPathForFile: (file) => {
+    try {
+      return webUtils.getPathForFile(file);
+    } catch (err) {
+      console.error('[PRELOAD] getPathForFile error:', err.message);
+      return null;
+    }
   },
 
   // Main → Renderer: receive a log line

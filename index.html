@@ -110,14 +110,30 @@
   <div class="section-title">Claim Details</div>
 
   <div class="input-group">
-    <label for="claimInput">Claim / Intimation Number(s)</label>
+    <label for="excelInput">Upload Excel (.xlsx)</label>
     <input
-      type="text"
-      id="claimInput"
-      placeholder="e.g. 260102320P, 260102321P or separated by space"
-      autocomplete="off"
+      type="file"
+      id="excelInput"
+      accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     />
-    <div class="input-hint">Separate multiple claim numbers with comma ( , ) or space ( )</div>
+    <div class="input-hint">
+      File must contain column: <strong>Claim No</strong>.
+    </div>
+
+    <div
+      id="excelFileName"
+      style="margin-top:8px; width:100%; padding:9px 10px; border:1px solid #ddd; border-radius:5px; background:#fafafa; font-size:13px; color:#444; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+      title="No file selected"
+    >
+      No file selected
+    </div>
+
+    <div class="note-blue" style="margin-top:10px;">
+      <strong>Excel format example</strong><br>
+      Claim No<br>
+      260102320P<br>
+      OC-XX-XXXX-XXXX-XXXXXXXX
+    </div>
   </div>
 
   <h3>Automation Runner</h3>
@@ -137,8 +153,8 @@
     <h2>How to Run / टूल कसे चालवायचे</h2>
     <ol>
       <li>
-        Enter the <strong>Claim / Intimation Number(s)</strong> — separate multiple by comma or space.<br>
-        <strong>क्लेम नंबर टाका — एकापेक्षा जास्त असल्यास comma किंवा space वापरा.</strong>
+        Upload the <strong>Excel (.xlsx)</strong> file having <strong>Claim No</strong> column.<br>
+        <strong>Claim No कॉलम असलेली Excel (.xlsx) फाईल upload करा.</strong>
       </li>
       <li>
         Click <strong>▶ Start</strong> — automation will launch the browser automatically.<br>
@@ -180,6 +196,24 @@
 
 <script src="renderer.js"></script>
 <script>
+  // Show selected excel file name immediately
+  (function () {
+    const excelInput = document.getElementById('excelInput');
+    const excelFileName = document.getElementById('excelFileName');
+    if (excelInput && excelFileName) {
+      excelInput.addEventListener('change', () => {
+        const f = excelInput.files && excelInput.files[0];
+        if (f) {
+          excelFileName.textContent = f.name;
+          excelFileName.title = f.name;
+        } else {
+          excelFileName.textContent = 'No file selected';
+          excelFileName.title = 'No file selected';
+        }
+      });
+    }
+  })();
+
   // Close popup via close button
   document.getElementById('btnClosePopup').addEventListener('click', () => {
     const popup = document.getElementById('popup');

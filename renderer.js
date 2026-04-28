@@ -226,7 +226,7 @@
 // -------------------------------------------------------
 // DOM REFERENCES
 // -------------------------------------------------------
-const claimInput   = document.getElementById('claimInput');
+const excelInput   = document.getElementById('excelInput');
 const btnStart     = document.getElementById('btnStart');
 const btnHow       = document.getElementById('btnHow');
 const logWindow    = document.getElementById('logWindow');
@@ -330,7 +330,7 @@ function setBanner(status) {
 function setRunning(running) {
   try {
     isRunning = running;
-    claimInput.disabled = running;
+    if (excelInput) excelInput.disabled = running;
 
     if (running) {
       btnStart.disabled = true;
@@ -363,10 +363,15 @@ btnStart.addEventListener('click', () => {
   try {
     if (isRunning) return;
 
-    const raw = claimInput.value.trim();
+    const file = excelInput && excelInput.files && excelInput.files[0];
+    const excelPath =
+      (file && file.path) ||
+      (file && window.electronAPI && typeof window.electronAPI.getPathForFile === 'function'
+        ? window.electronAPI.getPathForFile(file)
+        : null);
 
-    if (!raw) {
-      appendLog('[ERROR] Please enter at least one claim number before starting.');
+    if (!excelPath) {
+      appendLog('[ERROR] Please select an Excel (.xlsx) file before starting.');
       setBanner('error');
       return;
     }
@@ -375,12 +380,12 @@ btnStart.addEventListener('click', () => {
     appendSeparator();
     appendLog('[INFO] ========== RUN #' + runCount + ' STARTED ==========');
     appendSeparator();
-    appendLog('[INFO] Raw input: ' + raw);
+    appendLog('[INFO] Excel file: ' + (file?.name || excelPath));
 
     setBanner('running');
     setRunning(true);
 
-    window.electronAPI.startAutomation(raw);
+    window.electronAPI.startAutomation({ excelPath });
 
   } catch (err) {
     console.error('[RENDERER] btnStart click error:', err.message);
